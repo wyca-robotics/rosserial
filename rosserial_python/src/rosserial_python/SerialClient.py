@@ -533,7 +533,7 @@ class SerialClient(object):
                         self.callbacks[topic_id](msg)
                     except KeyError:
                         rospy.logerr("Tried to publish before configured, topic id %d" % topic_id)
-                        self.requestTopics()
+                        #self.requestTopics()
                     time.sleep(0.001)
                 else:
                     rospy.loginfo("wrong checksum for topic id and msg")
