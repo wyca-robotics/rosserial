@@ -160,7 +160,7 @@ class ServiceServer:
         self.data = None
 
     def unregister(self):
-        rospy.loginfo("Removing service: %s", self.topic)
+        rospy.loginfo("Removing service server: %s", self.topic)
         self.service.shutdown()
 
     def callback(self, req):
@@ -210,6 +210,9 @@ class ServiceClient:
         data_buffer = io.BytesIO()
         resp.serialize(data_buffer)
         self.parent.send(self.id, data_buffer.getvalue())
+
+    def unregister(self):
+        rospy.loginfo("Removing service client: %s", self.topic)
 
 class RosSerialServer:
     """
@@ -540,6 +543,10 @@ class SerialClient(object):
                 rospy.logwarn('Run loop error: %s' % exc)
                 # One of the read calls had an issue. Just to be safe, request that the client
                 # reinitialize their topics.
+                for sub in self.subscribers.values():
+                    sub.unregister()
+                for srv in self.services.values():
+                    srv.unregister()
                 with self.read_lock:
                     self.port.flushInput()
                 with self.write_lock:
